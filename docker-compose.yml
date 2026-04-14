@@ -1,0 +1,9 @@
+﻿version: '3'
+services:
+  web:
+    build: .
+    networks:
+      - finanzas-net
+networks:
+  finanzas-net:
+    driver: bridge

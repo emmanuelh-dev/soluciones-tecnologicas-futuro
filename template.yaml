@@ -1,0 +1,10 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  AppServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c7217cdde317cfec
+      IamInstanceProfile: LabRole
+  FinanzasBucket:
+    Type: AWS::S3::Bucket
