@@ -1,12 +1,4 @@
-﻿# Etapa 1: Build
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-
-# Etapa 2: Producción con Nginx
-FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
+﻿FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

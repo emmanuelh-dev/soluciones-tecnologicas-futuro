@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3 pyyaml
+
+      - name: Validate Bash script
+        run: bash -n limpieza.sh
+
+      - name: Validate Python script
+        run: python -m py_compile aws_report.py
+
+      - name: Validate CloudFormation template
+        run: |
+          python - <<'PY'
+          import yaml
+
+          with open('template.yaml', 'r', encoding='utf-8') as file:
+              yaml.safe_load(file)
+
+          print('template.yaml OK')
+          PY
+
+      - name: Validate Docker Compose
+        run: docker compose config
+
+      - name: Build Docker image
+        run: docker build -t soluciones-tecnologicas-futuro:ci .

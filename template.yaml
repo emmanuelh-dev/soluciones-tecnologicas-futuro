@@ -1,4 +1,5 @@
 ﻿AWSTemplateFormatVersion: '2010-09-09'
+Description: Plantilla CloudFormation para el entorno DevOps de Soluciones Tecnológicas del Futuro
 Resources:
   AppServer:
     Type: AWS::EC2::Instance
@@ -8,3 +9,10 @@ Resources:
       IamInstanceProfile: LabRole
   FinanzasBucket:
     Type: AWS::S3::Bucket
+Outputs:
+  InstanceId:
+    Description: Identificador lógico de la instancia EC2
+    Value: !Ref AppServer
+  BucketName:
+    Description: Nombre lógico del bucket S3
+    Value: !Ref FinanzasBucket
