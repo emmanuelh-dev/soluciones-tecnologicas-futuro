@@ -6,10 +6,10 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy_task:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to server
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -18,10 +18,12 @@ jobs:
           key: ${{ secrets.SSHKEY }}
           script: |
             export DOCKER_API_VERSION=1.44
-            # Usamos la ruta absoluta para evitar errores de navegación
-            cd $HOME/soluciones-tecnologicas-futuro/soluciones-tecnologicas-futuro
+            cd ~/soluciones-tecnologicas-futuro/soluciones-tecnologicas-futuro
             git reset --hard
             git pull origin main
+            # Si usa bun, asegúrese de que esté instalado en el servidor
+            # pero para su Docker lo que importa es esto:
             docker-compose build --no-cache
             docker-compose up -d
             docker ps
+            echo "✓ Proceso completado socio"
