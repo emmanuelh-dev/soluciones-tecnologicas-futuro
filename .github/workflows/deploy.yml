@@ -17,9 +17,9 @@ jobs:
           bash -n limpieza.sh
           echo "✓ Scripts Bash validados"
       
-      - name: Validate YAML files
+      - name: Validate YAML files (docker-compose, config)
         run: |
-          python3 -c "import yaml; yaml.safe_load(open('template.yaml')); yaml.safe_load(open('docker-compose.yml')); yaml.safe_load(open('config.yaml')); print('✓ Archivos YAML validados')"
+          python3 -c "import yaml; yaml.safe_load(open('docker-compose.yml')); yaml.safe_load(open('config.yaml')); print('✓ Archivos YAML validados')"
       
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -31,6 +31,11 @@ jobs:
           pip install boto3 pyyaml
           python3 -m py_compile aws_report.py
           echo "✓ Scripts Python validados"
+
+      - name: Validate CloudFormation template (cfn-lint)
+        run: |
+          pip install cfn-lint
+          cfn-lint template.yaml
       
       - name: Validate Dockerfile
         run: |
