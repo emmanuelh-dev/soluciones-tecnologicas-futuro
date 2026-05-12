@@ -191,12 +191,13 @@ soluciones-tecnologicas-futuro/
 git clone https://github.com/emmanuelh-dev/soluciones-tecnologicas-futuro.git
 cd soluciones-tecnologicas-futuro
 
+docker-compose up -d
 # 2. Ejecutar script de setup (Linux/Ubuntu)
 chmod +x setup_env.sh
 ./setup_env.sh
 
 # 3. Iniciar servicios
-docker-compose up -d
+docker compose up -d
 
 # 4. Verificar estado
 docker ps
