@@ -1,83 +1,237 @@
-﻿# Soluciones Tecnológicas del Futuro - Automatización DevOps
+﻿# Automatización DevOps - Soluciones Tecnológicas del Futuro
 
-Proyecto académico de automatización DevOps para una empresa fintech en expansión. El objetivo es mostrar una base reproducible de infraestructura, contenedorización, automatización con AWS y un pipeline de integración continua con GitHub Actions.
+**Presentado por:** Emmanuel Diaz Leal Hernandez / Maria Fernanda De Leon Mendoza  
+**Matrícula:** AL07092780  
+**Institución:** Universidad Tecmilenio
 
-## Integrantes
+---
 
-- Emmanuel Diaz Leal Hernandez
-- Maria Fernanda De Leon Mendoza
-- Matrícula: AL07092780
-- Institución: Universidad Tecmilenio
+## 1. Introducción y Estrategia
 
-## Objetivo
+Este proyecto presenta la implementación de un ecosistema DevOps automatizado para **Soluciones Tecnológicas del Futuro**, una empresa fintech en fase de expansión. La estrategia se centra en romper los silos tradicionales entre desarrollo y operaciones para fomentar una responsabilidad compartida.
 
-La solución está pensada para reducir tareas manuales, estandarizar despliegues y centralizar la observabilidad y la seguridad desde etapas tempranas.
+### Objetivos Principales
 
-## Componentes del proyecto
+- **Reducción de errores manuales:** Mediante la adopción de Infraestructura como Código (IaC).
+- **Agilidad en el despliegue:** Implementación de pipelines de CI/CD para entregas frecuentes y estables.
+- **Observabilidad Proactiva:** Monitoreo continuo del rendimiento y salud del sistema con AWS CloudWatch.
+- **Seguridad Integrada (DevSecOps):** Escaneo de vulnerabilidades desde las etapas iniciales del desarrollo.
 
-- Configuración de entorno Linux con Bash para instalar Docker, Python y Git, además de una tarea programada para limpieza de logs.
-- Automatización de inventario de recursos AWS con Python y Boto3.
-- Infraestructura como código con AWS CloudFormation en formato YAML.
-- Contenedorización con Docker y orquestación local con Docker Compose.
-- Pipeline de CI con GitHub Actions para validar scripts, plantilla de infraestructura, Docker Compose y la imagen Docker.
+---
 
-## Estructura del repositorio
+## 2. Configuración del Entorno (Linux & Bash)
 
-- [limpieza.sh](limpieza.sh): automatización del entorno y mantenimiento básico.
-- [aws_report.py](aws_report.py): inventario de buckets S3 e instancias EC2.
-- [template.yaml](template.yaml): plantilla CloudFormation con EC2 y S3.
-- [Dockerfile](Dockerfile): imagen Nginx para servir la vista estática del proyecto.
-- [docker-compose.yml](docker-compose.yml): definición del servicio web en la red aislada finanzas-net.
-- [.github/workflows/ci.yml](.github/workflows/ci.yml): pipeline de GitHub Actions.
-- [config.yaml](config.yaml): configuración mínima de instancia.
+### Script de Automatización Interactivo
 
-## Configuración del entorno
+Para garantizar un entorno de trabajo reproducible, se utiliza una instancia EC2 con Ubuntu. La automatización de la configuración se realiza mediante el script `setup_env.sh` con menú interactivo que permite validar cambios antes de ejecutarlos.
 
-El script [limpieza.sh](limpieza.sh) replica la automatización descrita en la actividad para Ubuntu en EC2:
+### Uso del Script de Setup
 
-- Actualiza el sistema.
-- Instala Docker, Python 3 y Git.
-- Habilita el servicio Docker.
-- Agrega el usuario actual al grupo docker.
-- Configura una tarea cron diaria para limpiar archivos .log en /var/log.
+```bash
+# Hacer el script ejecutable
+chmod +x setup_env.sh
 
-## Automatización con AWS
+# Ejecutar el script interactivo
+./setup_env.sh
+```
 
-El script [aws_report.py](aws_report.py) usa Boto3 para consultar:
+**El script realiza:**
+- ✓ Actualización de paquetes del sistema (`apt update && apt upgrade`)
+- ✓ Instalación de Docker, Python3-pip y Git
+- ✓ Configuración del servicio Docker (enable y start)
+- ✓ Adición del usuario actual al grupo `docker` (sin requerir `sudo`)
+- ✓ Creación de tarea cron para limpieza de logs diarios a las 00:00
 
-- Buckets S3 disponibles.
-- Estado de las instancias EC2.
+**Características:**
+- ✓ Menú interactivo con confirmaciones en cada paso
+- ✓ Modo DRY-RUN para simular sin cambios reales
+- ✓ Validaciones previas a ejecución
+- ✓ Salida con colores para mejor legibilidad
 
-La región se toma de la variable AWS_REGION y, si no existe, usa us-east-1.
+**⚠️ Importante:** Este script requiere permisos de `sudo` en el sistema. Está diseñado para entornos basados en Debian/Ubuntu (EC2, instancias Linux). No ejecutar en macOS o Windows sin adaptaciones.
 
-## Infraestructura como código
+---
 
-La plantilla [template.yaml](template.yaml) define:
+## 3. Automatización de Recursos (Python & Boto3)
 
-- Una instancia EC2 t2.micro con el rol preexistente LabRole.
-- Un bucket S3 para el entorno del proyecto.
+La gestión programática de la nube de AWS se implementa utilizando Python y el SDK Boto3. Este enfoque permite una auditoría eficiente de recursos y control de costos dentro de las restricciones del Learner Lab.
 
-## Contenedorización
+### Script de Reporte AWS
 
-La imagen Docker se apoya en Nginx para servir una página estática del proyecto. Esto permite validar el empaquetado del front de presentación de la actividad y mantener una construcción simple y reproducible.
+```bash
+python3 aws_report.py
+```
 
-## CI con GitHub Actions
+**Funcionalidades:**
+- Lista todos los buckets S3 disponibles
+- Muestra el estado de instancias EC2
+- Reporta uso de recursos para optimización de costos
 
-El pipeline valida los puntos críticos del repositorio:
+**Configuración:**
+- Region por defecto: `us-east-1` (configurable via variable `AWS_REGION`)
+- Requiere credenciales de AWS en `~/.aws/credentials` o variables de entorno
 
-- Sintaxis de Bash en [limpieza.sh](limpieza.sh).
-- Compilación de [aws_report.py](aws_report.py).
-- Carga de la plantilla YAML de CloudFormation.
-- Validación de [docker-compose.yml](docker-compose.yml).
-- Construcción de la imagen definida en [Dockerfile](Dockerfile).
+---
 
-## Ejecución local
+## 4. Infraestructura como Código (AWS CloudFormation)
 
-1. Ejecutar el script de entorno en una instancia Ubuntu con permisos de sudo.
-2. Correr python3 aws_report.py con credenciales válidas de AWS.
-3. Validar la plantilla con la consola o con una herramienta compatible de CloudFormation.
-4. Construir la imagen con Docker y levantar el servicio con Docker Compose.
+Se utiliza una definición declarativa de la infraestructura mediante plantillas YAML de CloudFormation. Esto asegura que el entorno sea consistente y elimina configuraciones manuales propensas a errores.
 
-## Observabilidad y seguridad
+### Recursos Aprovisionados
 
-La propuesta de la actividad contempla monitoreo con CloudWatch, alarmas con SNS y controles DevSecOps para reducir errores antes del despliegue. Este repositorio deja la base documentada y validada para integrar esos componentes en iteraciones posteriores.
+- **Instancia EC2 (t2.micro):** Servidor de aplicación
+- **Bucket S3:** Almacenamiento de datos financieros
+
+### Seguridad
+
+- Uso exclusivo del rol preexistente **LabRole** para cumplir políticas de IAM
+- Respeto a límites de recursos del Learner Lab (máximo 9 instancias EC2)
+
+**Archivo:** [template.yaml](template.yaml)
+
+---
+
+## 5. Orquestación y Pipeline de CI/CD
+
+El flujo de entrega continua minimiza el tiempo entre el commit del código y su disponibilidad en producción.
+
+| Componente | Función |
+|-----------|---------|
+| **Docker** | Contenedorización de la aplicación con Nginx |
+| **Docker Compose** | Orquestación en red privada (`finanzas-net`) |
+| **GitHub** | Fuente única de verdad y control de versiones |
+| **GitHub Actions** | Automatización: Validación → Build → Deploy |
+
+### GitHub Actions Workflow
+
+El workflow de `Deploy` se ejecuta automáticamente en cada push a `main`:
+
+```
+1. Validate    → Valida scripts Bash, YAML y Python
+2. Build       → Construye imagen Docker
+3. Deploy      → Despliega a servidor vía SSH
+4. Verify      → Verifica contenedores activos
+```
+
+**Requisitos para activar el Deploy:**
+
+Configura los siguientes secretos en tu repositorio GitHub:
+
+```
+Settings → Secrets and variables → Actions → New repository secret
+```
+
+- **HOST:** IP o hostname del servidor
+- **PORT:** Puerto SSH (default: 22)
+- **USERNAME:** Usuario SSH del servidor
+- **SSHKEY:** Clave privada SSH
+
+**Generar clave SSH:**
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_fintech -N ""
+ssh-copy-id -i ~/.ssh/id_fintech.pub user@server-ip
+```
+
+**Archivo workflow:** [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
+
+---
+
+## 6. Monitoreo y Seguridad (DevSecOps)
+
+### Validaciones Automatizadas en el Pipeline
+
+1. **Análisis Estático (SAST):**
+   - Validación sintáctica de scripts Bash
+   - Validación de archivos YAML
+   - Compilación de scripts Python
+
+2. **Seguridad de Contenedores:**
+   - Construcción y validación de Dockerfile
+   - Uso de imágenes base ligeras (alpine)
+
+3. **Cumplimiento Automatizado:**
+   - Verificación de estructura de proyecto
+   - Pruebas de conectividad SSH post-deployment
+
+### Monitoreo en AWS CloudWatch
+
+Se establecen tableros y alarmas para:
+- CPU de instancias EC2
+- Latencia y throughput de red
+- Estado de buckets S3
+
+---
+
+## 7. Estructura del Proyecto
+
+```
+soluciones-tecnologicas-futuro/
+├── setup_env.sh              # Script de configuración interactivo
+├── limpieza.sh              # Script de limpieza de logs
+├── aws_report.py            # Reporte de recursos AWS
+├── Dockerfile               # Definición de imagen Docker
+├── docker-compose.yml       # Orquestación de servicios
+├── template.yaml            # Plantilla CloudFormation
+├── config.yaml              # Configuración de aplicación
+├── .github/
+│   └── workflows/
+│       └── deploy.yml       # Pipeline de CI/CD
+├── README.md                # Este archivo
+└── .gitignore               # Archivos a ignorar
+```
+
+---
+
+## 8. Instrucciones de Uso
+
+### Desarrollo Local
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/emmanuelh-dev/soluciones-tecnologicas-futuro.git
+cd soluciones-tecnologicas-futuro
+
+# 2. Ejecutar script de setup (Linux/Ubuntu)
+chmod +x setup_env.sh
+./setup_env.sh
+
+# 3. Iniciar servicios
+docker-compose up -d
+
+# 4. Verificar estado
+docker ps
+```
+
+### Despliegue Automatizado (GitHub Actions)
+
+1. Configura secretos SSH en GitHub
+2. Haz push a `main`:
+   ```bash
+   git add .
+   git commit -m "Cambios para deployment"
+   git push origin main
+   ```
+3. Observa el workflow en **Actions**
+4. El pipeline validará, construirá y desplegará automáticamente
+
+---
+
+## 9. Notas de Seguridad
+
+- ⚠️ **Nunca** commitear credenciales o claves privadas
+- ⚠️ Claves SSH deben tener permisos `600` (`chmod 600 ~/.ssh/id_fintech`)
+- ✓ Secretos almacenados en GitHub Secrets (cifrados y no visibles)
+- ✓ El pipeline no expone credenciales en logs
+
+---
+
+## 10. Referencias
+
+- **AWS CloudFormation:** https://docs.aws.amazon.com/cloudformation/
+- **GitHub Actions:** https://docs.github.com/en/actions
+- **Docker Compose:** https://docs.docker.com/compose/
+- **Boto3:** https://boto3.amazonaws.com/v1/documentation/api/latest/
+
+---
+
+**Repositorio:** https://github.com/emmanuelh-dev/soluciones-tecnologicas-futuro
