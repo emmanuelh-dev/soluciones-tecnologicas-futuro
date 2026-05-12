@@ -17,10 +17,11 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
           script: |
-            cd soluciones-tecnologicas-futuro
+            export DOCKER_API_VERSION=1.44
+            # Usamos la ruta absoluta para evitar errores de navegación
+            cd $HOME/soluciones-tecnologicas-futuro/soluciones-tecnologicas-futuro
             git reset --hard
             git pull origin main
             docker-compose build --no-cache
             docker-compose up -d
-            docker ps -a
-            echo "✓ Deployment completado exitosamente"
+            docker ps
