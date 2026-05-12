@@ -85,9 +85,9 @@ jobs:
             # Construir imagen Docker
             docker build -t fintech-app:latest .
             
-            # Iniciar contenedores con docker-compose
-            docker-compose down || true
-            docker-compose up -d
+            # Iniciar contenedores con Docker Compose (CLI v2)
+            docker compose down || true
+            docker compose up -d
             
             echo "✓ Deployment completado exitosamente"
       

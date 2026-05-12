@@ -177,7 +177,7 @@ print_summary() {
         echo "Próximos pasos:"
         echo "  1. Reinicia tu sesión o ejecuta: newgrp docker"
         echo "  2. Verifica que Docker funcione: docker ps"
-        echo "  3. Inicia los servicios: docker-compose up -d"
+        echo "  3. Inicia los servicios: docker compose up -d"
     else
         echo "Configuración cancelada"
     fi
